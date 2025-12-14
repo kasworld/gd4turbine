@@ -1,8 +1,8 @@
 extends Node3D
 class_name Turbine
 
-func init(r :float, w :float, co :Color) -> Turbine:
-	var spoke := 집중선만들기(r, 0.01, 0.99, w, 8, co)
+func init(r :float, w :float, arm :int, co :Color) -> Turbine:
+	var spoke := 집중선만들기(r, 0.01, 0.99, w, arm, co)
 	#spoke.rotate_y(PI/2)
 	add_child( spoke )
 
@@ -23,8 +23,8 @@ func 집중선만들기(r :float, start:float, end:float, depth :float, count :i
 	구분선.size = Vector3(길이, depth/10, depth )
 	var cell각도 := 2.0*PI / count
 	var radius := r-길이/2
-	var mms :MultiMeshShape = preload("res://multi_mesh_shape/multi_mesh_shape.tscn").instantiate().init(
-		구분선, Color.WHITE, count ,Vector3.ZERO )
+	var mms :MultiMeshShape = preload("res://multi_mesh_shape/multi_mesh_shape.tscn").instantiate().init_with_color(
+		구분선, Color.WHITE, count  )
 	for i in count:
 		var rad := cell각도 *i + cell각도/2
 		mms.set_inst_rotation(i, Vector3.BACK, rad)

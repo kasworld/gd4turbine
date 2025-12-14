@@ -57,9 +57,9 @@ var turbine_list :Array
 func turbine_demo() -> void:
 	var r:= 20.0
 	for i in range(-20,21):
+		var co := Color.RED.lerp(Color.BLUE, float(i+20)/40.0)
 		var rr := r*(sin(float(i)/30.0*PI)/4 +1.0)
-		var tb :Turbine = preload("res://turbine/turbine.tscn").instantiate().init(rr,1,Color.WHITE)
-		#r *=1.01
+		var tb :Turbine = preload("res://turbine/turbine.tscn").instantiate().init(rr,1,4,co)
 		turbine_list.append(tb)
 		tb.position = Vector3(0,0,i *2.2)
 		#tb.rotation.z = float(i)/10.0
