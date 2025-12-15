@@ -52,12 +52,11 @@ func _ready() -> void:
 	main_animation.animation_ended.connect(main_animation_ended)
 	start_all_animation()
 
-
 var turbine_list :Array
 func turbine_demo() -> void:
 	var r:= 20.0
 	for i in range(-20,21):
-		var co := Color.RED.lerp(Color.BLUE, float(i+20)/40.0)
+		var co := Color( Color.RED.lerp(Color.BLUE, float(i+20)/40.0) , 0.5)
 		var rr := r*(sin(float(i)/30.0*PI)/4 +1.0)
 		var tb :Turbine = preload("res://turbine/turbine.tscn").instantiate().init(rr,1,4,co)
 		turbine_list.append(tb)
