@@ -22,10 +22,10 @@ func 날개만들기(r :float, start:float, end:float, depth :float, count :int,
 	구분선.size = Vector3(길이, depth/10, depth )
 	var cell각도 := 2.0*PI / count
 	var radius := r-길이/2
-	$"날개들".init_with_color(구분선, Color.WHITE, count)
+	$"날개들".init_with_alpha(구분선, count, 1.0)
 	for i in count:
 		var rad := cell각도 *i + cell각도/2
 		$"날개들".set_inst_rotation(i, Vector3.BACK, rad)
 		$"날개들".set_inst_rotation(i, Vector3.LEFT, PI/10)
-		$"날개들".set_inst_pos(i, Vector3(cos(rad) *radius,sin(rad) *radius, 0) )
+		$"날개들".set_inst_position(i, Vector3(cos(rad) *radius,sin(rad) *radius, 0) )
 		$"날개들".set_inst_color(i, co)
