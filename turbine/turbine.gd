@@ -8,19 +8,22 @@ func init(count :int, radius :float, ring_width :float, arm_count :int, co1 :Col
 	blade_mesh.size = Vector3(radius, ring_width/10, ring_width )
 	$Blades.init_with_alpha(blade_mesh, count*arm_count)
 
-	set_transform_all()
+	set_transform_all(scale_cos)
 	set_color_all(co1,co2)
 	return self
 
-func set_transform_all() -> Turbine:
-	var count :int = $RingsOut.get_visible_count()
-	var arm_count :int = $Blades.get_visible_count() / count
+func scale_cos(rate :float) -> float:
+	return (cos(rate*PI*2)+3)/4
+
+func set_transform_all(scale_fn:Callable) -> Turbine:
+	var count :int = $RingsOut.multimesh.visible_instance_count
+	var arm_count :int = $Blades.multimesh.visible_instance_count / count
 	var mesh_size :Vector3 = $Blades.multimesh.mesh.size
 	var ring_width := mesh_size.z
 	var radius := mesh_size.x
 	for i in count:
 		var rate := float(i)/float(count-1)
-		var r_scale := (cos(rate*PI*2)+3)/4
+		var r_scale :float = scale_fn.call(rate)
 		var scaled_size := Vector3(r_scale,r_scale,1)
 		var ring_pos := Vector3(0,0,-count*ring_width/2 + i*ring_width)
 		$RingsOut.set_inst_scale(i, scaled_size)
@@ -42,26 +45,26 @@ func set_transform_all() -> Turbine:
 	return self
 
 func set_color_all(co1 :Color, co2 :Color) -> Turbine:
-	var count :int = $RingsOut.get_visible_count()
-	var arm_count :int = $Blades.get_visible_count() / count
+	var count :int = $RingsOut.multimesh.visible_instance_count
+	var arm_count :int = $Blades.multimesh.visible_instance_count / count
 	for i in count:
 		var rate := float(i)/float(count-1)
 		var co := co1.lerp(co2, rate)
-		$RingsOut.set_inst_color(i,co)
-		$RingsIn.set_inst_color(i,co)
+		$RingsOut.multimesh.set_instance_color(i,co)
+		$RingsIn.multimesh.set_instance_color(i,co)
 		var base_int := i*arm_count
 		for j in arm_count:
-			$Blades.set_inst_color(base_int+j, co)
+			$Blades.multimesh.set_instance_color(base_int+j, co)
 	return self
 
 func set_inst_color(i:int, co :Color) -> void:
-	var count :int = $RingsOut.get_visible_count()
-	var arm_count :int = $Blades.get_visible_count() / count
-	$RingsOut.set_inst_color(i,co)
-	$RingsIn.set_inst_color(i,co)
+	var count :int = $RingsOut.multimesh.visible_instance_count
+	var arm_count :int = $Blades.multimesh.visible_instance_count / count
+	$RingsOut.multimesh.set_instance_color(i,co)
+	$RingsIn.multimesh.set_instance_color(i,co)
 	var base_int := i*arm_count
 	for j in arm_count:
-		$Blades.set_inst_color(base_int+j, co)
+		$Blades.multimesh.set_instance_color(base_int+j, co)
 
 func make_rings(rings :MultiMeshShape, count :int, radius :float, ring_width :float, flip_faces :bool) -> MultiMeshShape:
 	var ring_mesh := CylinderMesh.new()
