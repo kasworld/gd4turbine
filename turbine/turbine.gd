@@ -26,12 +26,12 @@ func set_transform_all(scale_fn:Callable) -> Turbine:
 		var r_scale :float = scale_fn.call(rate)
 		var scaled_size := Vector3(r_scale,r_scale,1)
 		var ring_pos := Vector3(0,0,-count*ring_width/2 + i*ring_width)
-		$RingsOut.set_inst_scale(i, scaled_size)
-		$RingsOut.set_inst_position(i,ring_pos)
-		$RingsOut.set_inst_rotation(i, Vector3.RIGHT, PI/2)
-		$RingsIn.set_inst_scale(i, scaled_size)
-		$RingsIn.set_inst_position(i,ring_pos)
-		$RingsIn.set_inst_rotation(i, Vector3.RIGHT, PI/2)
+
+		var t = Transform3D(Basis(), ring_pos)
+		t = t.scaled_local(scaled_size)
+		t = t.rotated_local(Vector3.RIGHT, PI/2)
+		$RingsOut.multimesh.set_instance_transform(i, t)
+		$RingsIn.multimesh.set_instance_transform(i, t)
 
 		var cell각도 := 2.0*PI / arm_count
 		var base_int := i*arm_count
