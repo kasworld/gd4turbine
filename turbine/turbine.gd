@@ -36,9 +36,10 @@ func set_transform_all(scale_fn:Callable) -> Turbine:
 		var cell각도 := 2.0*PI / arm_count
 		var base_int := i*arm_count
 		var blade_rot_rad := rate * PI
+		var blade_radius := radius*r_scale/2
 		for j in arm_count:
 			var rad := cell각도 *j + blade_rot_rad
-			t = Transform3D(Basis(), Vector3(cos(rad) *radius*r_scale/2,sin(rad) *radius*r_scale/2, ring_pos.z))
+			t = Transform3D(Basis(), Vector3(cos(rad) *blade_radius,sin(rad) *blade_radius, ring_pos.z))
 			t = t.scaled_local(scaled_size)
 			t = t.rotated_local(Vector3.BACK, rad)
 			t = t.rotated_local(Vector3.LEFT, PI/10)
