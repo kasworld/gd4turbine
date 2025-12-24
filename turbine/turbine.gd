@@ -38,10 +38,11 @@ func set_transform_all(scale_fn:Callable) -> Turbine:
 		var blade_rot_rad := rate * PI
 		for j in arm_count:
 			var rad := cell각도 *j + blade_rot_rad
-			$Blades.set_inst_rotation(base_int+j, Vector3.BACK, rad)
-			$Blades.set_inst_rotation(base_int+j, Vector3.LEFT, PI/10)
-			$Blades.set_inst_position(base_int+j, Vector3(cos(rad) *radius*r_scale/2,sin(rad) *radius*r_scale/2, ring_pos.z) )
-			$Blades.set_inst_scale(base_int+j, scaled_size)
+			t = Transform3D(Basis(), Vector3(cos(rad) *radius*r_scale/2,sin(rad) *radius*r_scale/2, ring_pos.z))
+			t = t.scaled_local(scaled_size)
+			t = t.rotated_local(Vector3.BACK, rad)
+			t = t.rotated_local(Vector3.LEFT, PI/10)
+			$Blades.multimesh.set_instance_transform(base_int+j, t)
 	return self
 
 func set_color_all(co1 :Color, co2 :Color) -> Turbine:
