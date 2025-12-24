@@ -45,30 +45,24 @@ func _ready() -> void:
 	$FixedCameraLight.set_center_pos_far(Vector3.ZERO, 	Vector3(0, 0, WorldSize.z*2), WorldSize.length()*2)
 	$MovingCameraLightHober.set_center_pos_far( Vector3.ZERO, Vector3(0, 0, WorldSize.z), WorldSize.length()*2)
 	$MovingCameraLightAround.set_center_pos_far( Vector3.ZERO, Vector3(0, 0, WorldSize.z), WorldSize.length()*2)
-	$AxisArrow3D.set_size(10)
+	$AxisArrow3D.set_size(10).set_colors()
 
 	turbine_demo()
 
 	main_animation.animation_ended.connect(main_animation_ended)
 	start_all_animation()
 
-var turbine_list :Array
-func turbine_demo() -> void:
-	var r:= 20.0
-	for i in range(-20,21):
-		var co := Color( Color.RED.lerp(Color.BLUE, float(i+20)/40.0) , 0.5)
-		var rr := r*(sin(float(i)/30.0*PI)/4 +1.0)
-		var tb :Turbine = preload("res://turbine/turbine.tscn").instantiate().init(rr,1,4,co)
-		turbine_list.append(tb)
-		tb.position = Vector3(0,0,i *2.2)
-		#tb.rotation.z = float(i)/10.0
-		add_child(tb)
 
+var turbine :Turbine
+func turbine_demo() -> void:
+	turbine = preload("res://turbine/turbine.tscn").instantiate(
+		).init(40,WorldSize.z / 3, 2, 4, Color.BLUE, Color.RED)
+	turbine.rotation.y = PI/4
+	add_child(turbine)
 func turbine_rotate() -> void:
 	var t := Time.get_unix_time_from_system()
 	var rad := fposmod(t , PI*2)
-	for i in turbine_list.size():
-		turbine_list[i].rotation.z = (rad+float(i)/10) / 1
+	turbine.rotation.z = rad
 
 func label_demo() -> void:
 	if $"오른쪽패널/LabelPerformance".visible:
