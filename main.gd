@@ -56,13 +56,18 @@ func _ready() -> void:
 var turbine :Turbine
 func turbine_demo() -> void:
 	turbine = preload("res://turbine/turbine.tscn").instantiate(
-		).init(40,WorldSize.z / 3, 2, 4, Color.BLUE, Color.RED)
+		).init_basic(WorldSize.x,WorldSize.z / 4, 1, 4).set_color_all(random_color(),random_color(),
+		).set_transform_all(scale_cos)
 	turbine.rotation.y = PI/4
 	add_child(turbine)
+func scale_cos(rate :float) -> float:
+	return (cos(rate*PI*2)+2) * (rate/4+0.25)
 func turbine_rotate() -> void:
 	var t := Time.get_unix_time_from_system()
 	var rad := fposmod(t , PI*2)
 	turbine.rotation.z = rad
+func random_color() -> Color:
+	return NamedColorList.color_list.pick_random()[0]
 
 func label_demo() -> void:
 	if $"오른쪽패널/LabelPerformance".visible:
