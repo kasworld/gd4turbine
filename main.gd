@@ -62,10 +62,16 @@ func turbine_demo() -> void:
 	add_child(turbine)
 func scale_cos(rate :float) -> float:
 	return (cos(rate*PI*2)+2) * (rate/4+0.25)
+func scale_lambda(period :float) -> Callable:
+	return func(rate):
+		return (cos(rate*PI*2 + period)+2) * (rate/4+0.25)
 func turbine_rotate() -> void:
 	var t := Time.get_unix_time_from_system()
 	var rad := fposmod(t , PI*2)
 	turbine.rotation.z = rad
+	turbine.set_transform_all(
+		scale_lambda(rad)
+		)
 func random_color() -> Color:
 	return NamedColorList.color_list.pick_random()[0]
 
