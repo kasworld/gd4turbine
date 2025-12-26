@@ -53,21 +53,23 @@ func _ready() -> void:
 	start_all_animation()
 
 
-var turbine_list :Array
+var turbine_list :Array # [ turbine , colorinfo ]
 func turbine_demo() -> void:
-	#for pos in [Vector3(WorldSize.x/4,WorldSize.y/4,0), Vector3(-WorldSize.x/4,WorldSize.y/4,0),
-				#Vector3(WorldSize.x/4,-WorldSize.y/4,0), Vector3(-WorldSize.x/4,-WorldSize.y/4,0)]:
-	make_turbine(Vector3.ZERO)
+	var unit_rad := 2*PI/4
+	var radius := WorldSize.z/4
+	for i in 4:
+		make_turbine(Vector3(cos(i*unit_rad), 0, sin(i*unit_rad))*radius )
 	#turbine_list[0].set_transform_all(Turbine.scale_1, Turbine.shift_zero, Turbine.rotate_PI, Turbine.blade_rotate_lambda(PI/10))
-	turbine_list[0].set_transform_all(scale_tornado, shift_tornado, Turbine.rotate_PI)
-	turbine_list[0].rotation.x = -PI/2
+	#turbine_list[0].set_transform_all(scale_tornado, shift_tornado, Turbine.rotate_PI)
+	#turbine_list[0].rotation.x = -PI/2
 
 func make_turbine(pos :Vector3) -> Turbine:
 	var tb = preload("res://turbine/turbine.tscn").instantiate(
 		).init_sample(WorldSize.x, WorldSize.z*0.5, 1, 4, random_color(),random_color())
-	turbine_list.append(tb)
 	tb.position = pos
 	add_child(tb)
+	tb.rotation.x = -PI/2
+	turbine_list.append([tb, AnimateGradient.new()])
 	return tb
 
 func scale_lambda(t :float) -> Callable:
@@ -92,24 +94,18 @@ func shift_tornado(rate):
 	var period := PI*2
 	return Vector3(cos(rate*period), sin(rate*period), 0) * WorldSize.x/5
 
-var turbine_color_list := [random_color(),random_color(),random_color(),random_color()]
-var turbine_color_rate :float
 func turbine_animate() -> void:
-	if turbine_color_rate >= 1:
-		turbine_color_rate = 0
-		turbine_color_list = [turbine_color_list[1], random_color(), turbine_color_list[3], random_color()]
-	else:
-		turbine_color_rate += 1.0/60.0
 	var t := Time.get_unix_time_from_system()
 	var rad := fposmod(t, PI*2)
-	turbine_list[0].set_color_all(
-		lerp(turbine_color_list[0], turbine_color_list[1],turbine_color_rate),
-		lerp(turbine_color_list[2], turbine_color_list[3],turbine_color_rate),
-	)
-	turbine_list[0].set_transform_all(scale_tornado, shift_tornado_lambda( sin(t) ), rotate_lambda( sin(t) ),Turbine.blade_rotate_lambda(rad/PI/2))
-	#turbine_list[1].set_transform_all(scale_lambda(rad), Turbine.shift_zero, Turbine.rotate_PI)
-	#turbine_list[2].set_transform_all(Turbine.scale_1, shift_lambda(rad), Turbine.rotate_PI)
-	#turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad),Turbine.blade_rotate_lambda(rad/PI/2))
+	var unit_rad := 2*PI/4
+	var radius := WorldSize.z
+	for i in 4:
+		var tt := t+ i
+		turbine_list[i][0].set_transform_all(scale_tornado, shift_tornado_lambda( sin(tt) ), rotate_lambda( sin(tt) ),Turbine.blade_rotate_lambda(rad/PI/2))
+		turbine_list[i][0].set_color_all(turbine_list[i][1].get_color1(),turbine_list[i][1].get_color2())
+		turbine_list[i][1].inc_rate()
+		turbine_list[i][0].position = Vector3(cos(i*unit_rad+t)*2*radius, sin(i*unit_rad+t*1.7)*radius/2, sin(i*unit_rad+t)*radius)
+		turbine_list[i][0].rotation.y = -rad*5
 func random_color() -> Color:
 	return NamedColorList.color_list.pick_random()[0]
 
