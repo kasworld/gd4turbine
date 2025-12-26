@@ -55,21 +55,13 @@ func _ready() -> void:
 
 var turbine_list :Array
 func turbine_demo() -> void:
-	for pos in [
-		Vector3(WorldSize.x/2,WorldSize.y/2,0),
-		Vector3(-WorldSize.x/2,WorldSize.y/2,0),
-		Vector3(WorldSize.x/2,-WorldSize.y/2,0),
-		Vector3(-WorldSize.x/2,-WorldSize.y/2,0),]:
+	for pos in [Vector3(WorldSize.x/4,WorldSize.y/4,0), Vector3(-WorldSize.x/4,WorldSize.y/4,0),
+				Vector3(WorldSize.x/4,-WorldSize.y/4,0), Vector3(-WorldSize.x/4,-WorldSize.y/4,0)]:
 		var tb = preload("res://turbine/turbine.tscn").instantiate(
-			).init_sample(WorldSize.x,WorldSize.z / 4, 1, 4, random_color(),random_color())
+			).init_sample(WorldSize.x*0.7, WorldSize.z*0.2, 1, 4, random_color(),random_color())
 		turbine_list.append(tb)
 		tb.position = pos
 		add_child(tb)
-	for i in 4:
-		turbine_color_list.append(random_color())
-func make_turbine() -> Turbine:
-	return preload("res://turbine/turbine.tscn").instantiate(
-			).init_sample(WorldSize.x,WorldSize.z / 4, 1, 4, random_color(),random_color())
 func scale_lambda(period :float) -> Callable:
 	return func(rate):
 		var x = (cos(rate*PI*2 + period)+2) * (rate/4+0.25)
@@ -77,30 +69,25 @@ func scale_lambda(period :float) -> Callable:
 		return Vector3(x,y,1)
 func shift_lambda(rad :float) -> Callable:
 	return func(rate):
-		return Vector3(cos(rad), sin(rad), 0) * rate * 50
+		return Vector3(cos(rad), sin(rad), 0) * rate * WorldSize.x/5
 func rotate_lambda(rad :float) -> Callable:
 	return func(rate):
 		return PI*rate*rad
 
-var turbine_color_list :Array
+var turbine_color_list := [random_color(),random_color(),random_color(),random_color()]
 var turbine_color_rate :float
 func turbine_animate() -> void:
 	if turbine_color_rate >= 1:
 		turbine_color_rate = 0
-		turbine_color_list[0] = turbine_color_list[1]
-		turbine_color_list[1] = random_color()
-		turbine_color_list[2] = turbine_color_list[3]
-		turbine_color_list[3] = random_color()
+		turbine_color_list = [turbine_color_list[1], random_color(), turbine_color_list[3], random_color()]
 	else:
 		turbine_color_rate += 1.0/60.0
 	var t := Time.get_unix_time_from_system()
 	var rad := fposmod(t , PI*2)
-	#turbine.rotation.z = rad
 	turbine_list[0].set_color_all(
 		lerp(turbine_color_list[0], turbine_color_list[1],turbine_color_rate),
 		lerp(turbine_color_list[2], turbine_color_list[3],turbine_color_rate),
 	)
-	#turbine_list[0].set_transform_all(Turbine.scale_1, Turbine.shift_zero, Turbine.rotate_zero)
 	turbine_list[1].set_transform_all(scale_lambda(rad), Turbine.shift_zero, Turbine.rotate_zero)
 	turbine_list[2].set_transform_all(Turbine.scale_1, shift_lambda(rad), Turbine.rotate_zero)
 	turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad))
