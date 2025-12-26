@@ -62,6 +62,7 @@ func turbine_demo() -> void:
 		turbine_list.append(tb)
 		tb.position = pos
 		add_child(tb)
+	turbine_list[0].set_transform_all(Turbine.scale_1, Turbine.shift_zero, Turbine.rotate_PI, Turbine.blade_rotate_lambda(PI/10))
 func scale_lambda(period :float) -> Callable:
 	return func(rate):
 		var x = (cos(rate*PI*2 + period)+2) * (rate/4+0.25)
@@ -73,9 +74,6 @@ func shift_lambda(rad :float) -> Callable:
 func rotate_lambda(rad :float) -> Callable:
 	return func(rate):
 		return PI*rate*rad
-func blade_rotate_lambda(rad :float) -> Callable:
-	return func(rate):
-		return rad/PI/2
 
 var turbine_color_list := [random_color(),random_color(),random_color(),random_color()]
 var turbine_color_rate :float
@@ -91,9 +89,9 @@ func turbine_animate() -> void:
 		lerp(turbine_color_list[0], turbine_color_list[1],turbine_color_rate),
 		lerp(turbine_color_list[2], turbine_color_list[3],turbine_color_rate),
 	)
-	turbine_list[1].set_transform_all(scale_lambda(rad), Turbine.shift_zero, Turbine.rotate_zero)
-	turbine_list[2].set_transform_all(Turbine.scale_1, shift_lambda(rad), Turbine.rotate_zero)
-	turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad),blade_rotate_lambda(rad))
+	turbine_list[1].set_transform_all(scale_lambda(rad), Turbine.shift_zero, Turbine.rotate_PI)
+	turbine_list[2].set_transform_all(Turbine.scale_1, shift_lambda(rad), Turbine.rotate_PI)
+	turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad),Turbine.blade_rotate_lambda(rad/PI/2))
 func random_color() -> Color:
 	return NamedColorList.color_list.pick_random()[0]
 
