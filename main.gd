@@ -73,6 +73,9 @@ func shift_lambda(rad :float) -> Callable:
 func rotate_lambda(rad :float) -> Callable:
 	return func(rate):
 		return PI*rate*rad
+func blade_rotate_lambda(rad :float) -> Callable:
+	return func(rate):
+		return rad/PI/2
 
 var turbine_color_list := [random_color(),random_color(),random_color(),random_color()]
 var turbine_color_rate :float
@@ -83,14 +86,14 @@ func turbine_animate() -> void:
 	else:
 		turbine_color_rate += 1.0/60.0
 	var t := Time.get_unix_time_from_system()
-	var rad := fposmod(t , PI*2)
+	var rad := fposmod(t, PI*2)
 	turbine_list[0].set_color_all(
 		lerp(turbine_color_list[0], turbine_color_list[1],turbine_color_rate),
 		lerp(turbine_color_list[2], turbine_color_list[3],turbine_color_rate),
 	)
 	turbine_list[1].set_transform_all(scale_lambda(rad), Turbine.shift_zero, Turbine.rotate_zero)
 	turbine_list[2].set_transform_all(Turbine.scale_1, shift_lambda(rad), Turbine.rotate_zero)
-	turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad))
+	turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad),blade_rotate_lambda(rad))
 func random_color() -> Color:
 	return NamedColorList.color_list.pick_random()[0]
 
