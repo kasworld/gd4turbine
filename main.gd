@@ -55,25 +55,42 @@ func _ready() -> void:
 
 var turbine_list :Array
 func turbine_demo() -> void:
-	for pos in [Vector3(WorldSize.x/4,WorldSize.y/4,0), Vector3(-WorldSize.x/4,WorldSize.y/4,0),
-				Vector3(WorldSize.x/4,-WorldSize.y/4,0), Vector3(-WorldSize.x/4,-WorldSize.y/4,0)]:
-		var tb = preload("res://turbine/turbine.tscn").instantiate(
-			).init_sample(WorldSize.x*0.7, WorldSize.z*0.2, 1, 4, random_color(),random_color())
-		turbine_list.append(tb)
-		tb.position = pos
-		add_child(tb)
-	turbine_list[0].set_transform_all(Turbine.scale_1, Turbine.shift_zero, Turbine.rotate_PI, Turbine.blade_rotate_lambda(PI/10))
-func scale_lambda(period :float) -> Callable:
+	#for pos in [Vector3(WorldSize.x/4,WorldSize.y/4,0), Vector3(-WorldSize.x/4,WorldSize.y/4,0),
+				#Vector3(WorldSize.x/4,-WorldSize.y/4,0), Vector3(-WorldSize.x/4,-WorldSize.y/4,0)]:
+	make_turbine(Vector3.ZERO)
+	#turbine_list[0].set_transform_all(Turbine.scale_1, Turbine.shift_zero, Turbine.rotate_PI, Turbine.blade_rotate_lambda(PI/10))
+	turbine_list[0].set_transform_all(scale_tornado, shift_tornado, Turbine.rotate_PI)
+	turbine_list[0].rotation.x = -PI/2
+
+func make_turbine(pos :Vector3) -> Turbine:
+	var tb = preload("res://turbine/turbine.tscn").instantiate(
+		).init_sample(WorldSize.x, WorldSize.z*0.5, 1, 4, random_color(),random_color())
+	turbine_list.append(tb)
+	tb.position = pos
+	add_child(tb)
+	return tb
+
+func scale_lambda(t :float) -> Callable:
 	return func(rate):
-		var x = (cos(rate*PI*2 + period)+2) * (rate/4+0.25)
-		var y = (sin(rate*PI*2 + period)+2) * (rate/4+0.25)
+		var x = (cos(rate*PI*2 + t)+2) * (rate/4+0.25)
+		var y = (sin(rate*PI*2 + t)+2) * (rate/4+0.25)
 		return Vector3(x,y,1)
-func shift_lambda(rad :float) -> Callable:
+func shift_lambda(t :float) -> Callable:
 	return func(rate):
-		return Vector3(cos(rad), sin(rad), 0) * rate * WorldSize.x/5
-func rotate_lambda(rad :float) -> Callable:
+		return Vector3(cos(t), sin(t), 0) * rate * WorldSize.x/5
+func rotate_lambda(t :float) -> Callable:
 	return func(rate):
-		return PI*rate*rad
+		return 2*PI*rate*t
+
+func scale_tornado(rate):
+	return Vector3(rate,rate,1)*rate
+func shift_tornado_lambda(t :float) -> Callable:
+	return func(rate):
+		var period := 5
+		return Vector3(cos(rate*period), sin(rate*period), 0) * t * WorldSize.x/5
+func shift_tornado(rate):
+	var period := PI*2
+	return Vector3(cos(rate*period), sin(rate*period), 0) * WorldSize.x/5
 
 var turbine_color_list := [random_color(),random_color(),random_color(),random_color()]
 var turbine_color_rate :float
@@ -89,9 +106,10 @@ func turbine_animate() -> void:
 		lerp(turbine_color_list[0], turbine_color_list[1],turbine_color_rate),
 		lerp(turbine_color_list[2], turbine_color_list[3],turbine_color_rate),
 	)
-	turbine_list[1].set_transform_all(scale_lambda(rad), Turbine.shift_zero, Turbine.rotate_PI)
-	turbine_list[2].set_transform_all(Turbine.scale_1, shift_lambda(rad), Turbine.rotate_PI)
-	turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad),Turbine.blade_rotate_lambda(rad/PI/2))
+	turbine_list[0].set_transform_all(scale_tornado, shift_tornado_lambda( sin(t) ), rotate_lambda( sin(t) ),Turbine.blade_rotate_lambda(rad/PI/2))
+	#turbine_list[1].set_transform_all(scale_lambda(rad), Turbine.shift_zero, Turbine.rotate_PI)
+	#turbine_list[2].set_transform_all(Turbine.scale_1, shift_lambda(rad), Turbine.rotate_PI)
+	#turbine_list[3].set_transform_all(Turbine.scale_1, Turbine.shift_zero, rotate_lambda(rad),Turbine.blade_rotate_lambda(rad/PI/2))
 func random_color() -> Color:
 	return NamedColorList.color_list.pick_random()[0]
 
