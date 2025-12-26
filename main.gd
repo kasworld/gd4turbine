@@ -57,18 +57,17 @@ var turbine :Turbine
 func turbine_demo() -> void:
 	turbine = preload("res://turbine/turbine.tscn").instantiate(
 		).init_basic(WorldSize.x,WorldSize.z / 4, 1, 4).set_color_all(random_color(),random_color(),
-		).set_transform_all(scale_cos, Turbine.shift_zero, Turbine.rotate_PI)
+		).set_transform_all(Turbine.scale_1, Turbine.shift_zero, Turbine.rotate_PI)
 	#turbine.rotation.y = PI/4
 	add_child(turbine)
-func scale_cos(rate :float) -> float:
-	return (cos(rate*PI*2)+2) * (rate/4+0.25)
 func scale_lambda(period :float) -> Callable:
 	return func(rate):
-		return (cos(rate*PI*2 + period)+2) * (rate/4+0.25)
-func shift_rate(rate :float) -> Vector3:
-	return Vector3(0,0,0)*(rate-0.5)
-func rotate_PI(rate :float) -> float:
-	return PI*rate*2
+		var x = (cos(rate*PI*2 + period)+2) * (rate/4+0.25)
+		var y = (sin(rate*PI*2 + period)+2) * (rate/4+0.25)
+		return Vector3(x,y,1)
+func shift_lambda(rad :float) -> Callable:
+	return func(rate):
+		return Vector3(cos(rad), sin(rad), 0) * rate * 50
 func rotate_lambda(rad :float) -> Callable:
 	return func(rate):
 		return PI*rate*rad
@@ -78,7 +77,7 @@ func turbine_rotate() -> void:
 	var rad := fposmod(t , PI*2)
 	#turbine.rotation.z = rad
 	turbine.set_transform_all(
-		scale_lambda(rad), Turbine.shift_zero, rotate_lambda(rad)
+		scale_lambda(rad), shift_lambda(rad), rotate_lambda(rad)
 		)
 func random_color() -> Color:
 	return NamedColorList.color_list.pick_random()[0]
