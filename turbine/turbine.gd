@@ -59,6 +59,7 @@ func set_transform_all(
 	var ring_radius := mesh_size.x
 	var arm_to_arm_radian_in_ring := 2.0*PI / arm_count
 	var start_pos_z := -count*ring_width/2
+	#var blade_rotate :float= (rotate_fn.call(1.0)-rotate_fn.call(0))/arm_count/PI
 	for i in count:
 		var rate := float(i)/float(count-1)
 		var scaled_size :Vector3 = scale_fn.call(rate)
@@ -82,7 +83,7 @@ func set_transform_all(
 			t = t.scaled_local(scaled_size)
 			t = t.rotated_local(Vector3.BACK, rad)
 			t = t.rotated_local(Vector3.LEFT, blade_rotate_fn.call(rate))
-			#t = t.rotated_local(Vector3.LEFT, PI/10)
+			#t = t.rotated_local(Vector3.LEFT, blade_rotate)
 			$Blades.multimesh.set_instance_transform(base_int+j, t)
 	return self
 
